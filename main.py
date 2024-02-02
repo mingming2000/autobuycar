@@ -84,12 +84,11 @@ if __name__ == "__main__":
     try:
         while True:
             # Measure angle and distance in sequential!
-            measured_angle = camera.calculate_angle()
-            bcolors.print_green('Camera Done')
-            bcolors.print_blue(f'>>> Angle: {measured_angle}')
             measured_distance = bluetooth.calculate_distance()
-            bcolors.print_green('Bluetooth Done')
+            # bcolors.print_green('Bluetooth Done')
             bcolors.print_blue(f'>>> Distance: {measured_distance}')
+
+            direction = None
 
             # Control DC Motor!
             if(measured_distance > lamda2): # Forward
@@ -103,27 +102,33 @@ if __name__ == "__main__":
                 pwm_r.ChangeDutyCycle(0)
                 pwm_l.ChangeDutyCycle(10)
             else:
-                bcolors.print_warning('Direction Error')
+                # bcolors.print_warning('Direction Error')
                 direction = None
                 pwm_r.ChangeDutyCycle(0)
                 pwm_l.ChangeDutyCycle(0)
 
+            measured_angle = camera.calculate_angle()
+            # bcolors.print_green('Camera Done')
+            bcolors.print_blue(f'>>> Angle: {measured_angle}')
+            
             # Control Servo Motor!
             degree_servo = 1300 + measured_angle * 6 
-            if(direction == 'Forward'):
-                bcolors.print_green('Turn Left')
+            if(direction == 'Forward' or direction == None):
                 if(degree_servo < 1500) :
+                    bcolors.print_green('Turn Left')
                     servo.set_servo_pulsewidth(servoPin, degree_servo)
                 elif (degree_servo > 1700 ):
+                    bcolors.print_green('Turn Right')
                     servo.set_servo_pulsewidth(servoPin, degree_servo)
                 else:
                     servo.set_servo_pulsewidth(servoPin, 1600)
             
             elif(direction == 'Backward'):
-                bcolors.print_green('Turn Right')
                 if(degree_servo < 1500) :
+                    bcolors.print_green('Turn Left')
                     servo.set_servo_pulsewidth(servoPin, 3200 - degree_servo)
                 elif (degree_servo > 1700 ):
+                    bcolors.print_green('Turn Right')
                     servo.set_servo_pulsewidth(servoPin, 3200 - degree_servo)
                 else:
                     servo.set_servo_pulsewidth(servoPin, 1600)
@@ -132,7 +137,6 @@ if __name__ == "__main__":
                 servo.set_servo_pulsewidth(servoPin, 1600)
 
     except KeyboardInterrupt as e: # Terminate GPIO and Servo Pins Safety!
-        camera.release()
         pwm_r.stop()
         pwm_l.stop()
         GPIO.cleanup()
@@ -140,7 +144,6 @@ if __name__ == "__main__":
         servo.set_PWM_frequency(servoPin, 0)
         servo.stop()
     finally: # Terminate GPIO and Servo Pins Safety!
-        camera.release()
         pwm_r.stop()
         pwm_l.stop()
         GPIO.cleanup()
