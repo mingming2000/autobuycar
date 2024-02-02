@@ -57,8 +57,19 @@ if __name__ == "__main__":
     servo.set_PWM_frequency(servoPin, 50)
 
     # Initialization DC Motor in Here!
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+
+    GPIO.setup(R_EN, GPIO.OUT)
+    GPIO.setup(L_EN, GPIO.OUT)
+    GPIO.setup(RPWM, GPIO.OUT)
+    GPIO.setup(LPWM, GPIO.OUT)
+
     pwm_r = GPIO.PWM(RPWM, 100)
     pwm_l = GPIO.PWM(LPWM, 100)
+
+    pwm_r.start(0)
+    pwm_l.start(0)
 
     # Initialization MultiTasks and others in Here!
     camera = Camera()
