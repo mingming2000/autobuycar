@@ -12,12 +12,13 @@ class Camera:
         self.lower = lower
         self.upper = upper
         self.device_idx = 0
+        self.webcam_video = cv2.VideoCapture(device_idx)
 
     def initializing(self):
 
         while True:
-            webcam_video = cv2.VideoCapture(self.device_idx)
-            success, video = webcam_video.read()
+            # webcam_video = cv2.VideoCapture(self.device_idx)
+            success, video = self.webcam_video.read()
             img = cv2.cvtColor(video, cv2.COLOR_BGR2HSV) 
             img_h, img_w, img_c = img.shape  
 
@@ -30,7 +31,7 @@ class Camera:
                         x, y, w, h = cv2.boundingRect(mask_contour)
                         if (x + w/2 > img_w * 0.4 and x + w/2 < img_w * 0.6):
                             print("camera Ready done")
-                            webcam_video.release()
+                            self.webcam_video.release()
                             return True
             
 

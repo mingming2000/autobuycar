@@ -75,9 +75,11 @@ if __name__ == "__main__":
     camera = Camera()
     bluetooth = Bluetooth()
 
+    bcolors.print_green('Initializing Start!')
     camera.initializing()
+    bcolors.print_green('Initializing Camera Finish!')
     bluetooth.initializing()
-    bcolors.print_green('Initializing Finish!')
+    bcolors.print_green('Initializing Bluetooth Finish!')
 
     try:
         while True:
