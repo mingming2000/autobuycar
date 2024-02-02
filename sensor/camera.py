@@ -35,7 +35,7 @@ class Camera:
                             return True
             
 
-    def calculate_angle(self) -> float | None:
+    def calculate_angle(self):
         webcam_video2 = cv2.VideoCapture(self.device_idx)
         _, video = webcam_video2.read()
         img = cv2.cvtColor(video, cv2.COLOR_BGR2HSV) 
@@ -43,13 +43,17 @@ class Camera:
 
         mask = cv2.inRange(img, self.lower, self.upper) 
         mask_contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
-
+        degree = 50
         if len(mask_contours) != 0:
             for mask_contour in mask_contours:
                 if cv2.contourArea(mask_contour) > 1000:
                     x, y, w, h = cv2.boundingRect(mask_contour)
                     degree = (x + w/2) * 100 / img_w
+            cv2.imshow('Camera', img)
+        
+            webcam_video2.release()
             return degree
         else:
-            degree = 50
+            webcam_video2.release()
             return degree
+        
