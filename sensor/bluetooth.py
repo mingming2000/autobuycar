@@ -26,18 +26,18 @@ class Bluetooth:
                     self.mid = np.mean(self.rssi_list)
 
                 elif(len(self.rssi_list)<30):                            
-                    if(self.rssi >= self.mid * 0.95 and self.rssi <= self.mid * 1.1):
+                    if(rssi >= self.mid -4 and rssi <= self.mid +5):
                         self.rssi_list.append(rssi)
                         self.mid = np.mean(self.rssi_list)
 
                 else:
                     self.rssi_list.append(rssi)
                     self.mid = np.mean(self.rssi_list)    
-                    if ((len(self.rssi_list)==30) and (self.calibration==0)):
+                    if (self.calibration==0):
                         self.rssi_list.pop()
                         self.calibration = self.mid
                         print(f"\rcalibrated {self.calibration}")
-                print(f"\rRSSI: {rssi}, mid: {self.mid}, list {self.rssi_list}",end="")
+                print(f"\r{len(self.rssi_list)}/30 RSSI: {rssi:.2f}, mid: {self.mid:.2f},",end="")
                 loop = asyncio.get_event_loop()
                 loop.create_task(self.scanner.stop())
 
@@ -47,22 +47,22 @@ class Bluetooth:
         await self.scanner.stop()
 
     async def calculate_dist(self):
-        def detection_callback(device):
-            weights = [1,0.8,0.7,0.4,0.3,0.2,0.1]
+        def detection_callback(device, advertisement_data):
+            weight = [1,0.8,0.7,0.4,0.2,0.1]
             if device.address == self.target_device:
                 rssi = device.rssi
                 if (self.calibration!=0):
                     if(len(self.rssi_list)>6):
                         self.rssi_list = self.rssi_list[0:6]
                     
-                    if (len(self.distance_list)<6):
+                    if (len(self.rssi_list)<6):
                         self.rssi_list.append(rssi)
 
                     elif(len(self.rssi_list)==6):
-                        if(self.rssi >= self.mid * 0.9 and self.rssi <= self.mid * 1.2):
+                        if(rssi >= self.mid * 0.9 and rssi <= self.mid * 1.2):
                             self.rssi_list.pop()
                             self.rssi_list.insert(0,rssi)
-                        final_distance = 10**(self.calibration-np.average(self.rssi_list, weights)/(10*2.4))
+                        final_distance = 10**(self.calibration-np.average(self.rssi_list, weights=weight)/(10*2.4))
                         print("final distance: ",final_distance)
                         self.distance = final_distance
 
