@@ -25,16 +25,13 @@ class Bluetooth:
                     self.rssi_list.append(rssi)
                     self.mid = np.mean(self.rssi_list)
 
-                elif(len(self.rssi_list)<30):                            
+                elif(len(self.rssi_list)<=30):                            
                     if(rssi >= self.mid -4 and rssi <= self.mid +5):
                         self.rssi_list.append(rssi)
                         self.mid = np.mean(self.rssi_list)
 
                 else:
-                    self.rssi_list.append(rssi)
-                    self.mid = np.mean(self.rssi_list)    
                     if (self.calibration==0):
-                        self.rssi_list.pop()
                         self.calibration = self.mid
                         print(f"\rcalibrated {self.calibration}")
                 print(f"\r{len(self.rssi_list)}/30 RSSI: {rssi:.2f}, mid: {self.mid:.2f},",end="")
@@ -55,14 +52,13 @@ class Bluetooth:
                     if(len(self.rssi_list)>6):
                         self.rssi_list = self.rssi_list[0:6]
                     
-                    if (len(self.rssi_list)<6):
-                        self.rssi_list.append(rssi)
+                    # if (len(self.rssi_list)<6):
+                    #     self.rssi_list.append(rssi)
 
                     elif(len(self.rssi_list)==6):
-                        if(rssi >= self.mid * 0.9 and rssi <= self.mid * 1.2):
-                            self.rssi_list.pop()
-                            self.rssi_list.insert(0,rssi)
-                        final_distance = 10**(self.calibration-np.average(self.rssi_list, weights=weight)/(10*2.4))
+                        self.rssi_list.pop()
+                        self.rssi_list.insert(0,rssi)
+                        final_distance = 10**((self.calibration-np.average(self.rssi_list, weights=weight))/(10*2.4))
                         print("final distance: ",final_distance)
                         self.distance = final_distance
 
