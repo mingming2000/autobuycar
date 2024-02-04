@@ -5,14 +5,14 @@ import numpy as np
 class Camera:
     def __init__(
         self, 
-        device_idx: int = 0,
+        # device_idx: int = 0,
         lower: np.ndarray = np.array([ 0, 150, 140]),
         upper: np.ndarray = np.array([50, 255, 255]),
     ):
+        self.device_idx = 0
         self.lower = lower
         self.upper = upper
-        self.device_idx = 0
-        self.webcam_video = cv2.VideoCapture(device_idx)
+        self.webcam_video = cv2.VideoCapture(self.device_idx)
 
     def initializing(self):
 
@@ -27,13 +27,13 @@ class Camera:
             
             if len(mask_contours) != 0:
                 for mask_contour in mask_contours:
-                    if cv2.contourArea(mask_contour) > 1000:
+                    if cv2.contourArea(mask_contour) > 500:
                         x, y, w, h = cv2.boundingRect(mask_contour)
                         if (x + w/2 > img_w * 0.4 and x + w/2 < img_w * 0.6):
                             print("camera Ready done")
-                            self.webcam_video.release()
+                            # self.webcam_video.release()
                             return True
-            
+                    
 
     def calculate_angle(self):
         webcam_video2 = cv2.VideoCapture(self.device_idx)
@@ -44,16 +44,13 @@ class Camera:
         mask = cv2.inRange(img, self.lower, self.upper) 
         mask_contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
         degree = 50
+        
         if len(mask_contours) != 0:
             for mask_contour in mask_contours:
                 if cv2.contourArea(mask_contour) > 1000:
                     x, y, w, h = cv2.boundingRect(mask_contour)
                     degree = (x + w/2) * 100 / img_w
-            cv2.imshow('Camera', img)
-        
-            webcam_video2.release()
             return degree
         else:
-            webcam_video2.release()
             return degree
         
