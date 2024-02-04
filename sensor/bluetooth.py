@@ -33,7 +33,7 @@ class Bluetooth:
                 else:
                     if (self.calibration==0):
                         self.calibration = self.mid
-                        print(f"\rcalibrated {self.calibration}")
+                        # print(f"\rcalibrated {self.calibration}")
                 print(f"\r{len(self.rssi_list)}/30 RSSI: {rssi:.2f}, mid: {self.mid:.2f},",end="")
                 loop = asyncio.get_event_loop()
                 loop.create_task(self.scanner.stop())
@@ -45,7 +45,7 @@ class Bluetooth:
 
     async def calculate_dist(self):
         def detection_callback(device, advertisement_data):
-            weight = [1,0.8,0.7,0.4,0.2,0.1]
+            weight = [1,0.8,0.7,0.4,0.2,0.2]
             if device.address == self.target_device:
                 rssi = device.rssi
                 if (self.calibration!=0):
@@ -56,10 +56,11 @@ class Bluetooth:
                     #     self.rssi_list.append(rssi)
 
                     elif(len(self.rssi_list)==6):
+                        
                         self.rssi_list.pop()
                         self.rssi_list.insert(0,rssi)
-                        final_distance = 10**((self.calibration-np.average(self.rssi_list, weights=weight))/(10*2.4))
-                        print("final distance: ",final_distance)
+                        final_distance = 10**(((self.calibration-np.average(self.rssi_list, weights=weight))/(10*3.5)))/2
+                        # print("final distance: ",final_distance)
                         self.distance = final_distance
 
                 loop = asyncio.get_event_loop()
