@@ -47,9 +47,12 @@ BACKWARD = 2
 HIGH = 1
 LOW = 0
 
-lamda1 = 0.35
-lamda2 = 0.65
+lamda1 = 0.5
+lamda2 = 0.8
 
+mode = 'Bluetooth'
+measured_angle = 50
+direction = None
 
 if __name__ == "__main__":
     # Initialization Servo Motor in Here!
@@ -85,49 +88,33 @@ if __name__ == "__main__":
     try:
         while True:
             # Measure angle and distance in sequential!
-            
-            
-            # Measure distance and control DC motor!
-            measured_distance = bluetooth.calculate_distance()
-            bcolors.print_blue(f'>>> Distance: {measured_distance}')
 
-            # Control DC Motor!
-            if(measured_distance > lamda2): # Forward
-                bcolors.print_green('Forward!')
-                direction = 'Forward'
-                pwm_r.ChangeDutyCycle(10)
-                pwm_l.ChangeDutyCycle(0)
-            elif(measured_distance < lamda1): # Backward
-                bcolors.print_green('Backward!')
-                direction = 'Backward'
-                pwm_r.ChangeDutyCycle(0)
-                pwm_l.ChangeDutyCycle(10)
-            else:
-                # bcolors.print_warning('Direction Error')
-                direction = None
-                pwm_r.ChangeDutyCycle(0)
-                pwm_l.ChangeDutyCycle(0)
-
-
+            len_max_contour = 0
+            measured_angle = 50
+            mode = "Bluetooth"
             # Measure angle and control servo motor!
-            while(True):
-                sucess, video = camera.webcam_video.read()
-                print(f">>> sucess: {sucess}")
-                if(sucess == True):
-                    img = cv2.cvtColor(video, cv2.COLOR_BGR2HSV) 
-                    img_h, img_w, img_c = img.shape  
+            sucess, video = camera.webcam_video.read()
+            # print(f">>> sucess: {sucess}")
+            if(sucess == True):
+                img = cv2.cvtColor(video, cv2.COLOR_BGR2HSV) 
+                img_h, img_w, img_c = img.shape  
 
-                    mask = cv2.inRange(img, camera.lower, camera.upper) 
-                    mask_contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
+                mask = cv2.inRange(img, camera.lower, camera.upper) 
+                mask_contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
 
-                    measured_angle = 50
-                    if len(mask_contours) != 0:
-                        for mask_contour in mask_contours:
-                            print(f">>> mask_contour: {cv2.contourArea(mask_contour)}")
-                            if cv2.contourArea(mask_contour) > 500:
-                                x, y, w, h = cv2.boundingRect(mask_contour)
-                                measured_angle = (x + w/2) * 100 / img_w
-                        break
+                if len(mask_contours) != 0:
+                    for mask_contour in mask_contours:
+                        area = cv2.contourArea(mask_contour)
+                        # if cv2.contourArea(mask_contour) > 500:
+                        if(len_max_contour < area):
+                            max_contour = mask_contour
+
+                    x, y, w, h = cv2.boundingRect(max_contour)
+                    # mean_x = lambda x: 
+                    measured_angle = (x + w/2) * 100 / img_w
+                    print(f">>> mask_contour: {area}, {max_contour.shape}")
+                    if(len_max_contour > 70000):
+                        mode = 'Camera'
 
             bcolors.print_blue(f'>>> Angle: {measured_angle}')
             
@@ -155,6 +142,36 @@ if __name__ == "__main__":
 
             else:
                 servo.set_servo_pulsewidth(servoPin, 1600)
+
+                       # Measure distance and control DC motor!
+            measured_distance = bluetooth.calculate_distance()
+            bcolors.print_blue(f'>>> Distance: {measured_distance}')
+
+            if(mode == 'Camera'):
+                    bcolors.print_warning('[Camera] Backward!')
+                    direction = 'Backward'
+                    pwm_r.ChangeDutyCycle(0)
+                    pwm_l.ChangeDutyCycle(10)
+                    mode = 'Bluetooth'
+
+            elif(mode == 'Bluetooth'):
+                # Control DC Motor!
+                if(measured_distance > lamda2): # Forward
+                    bcolors.print_green('Forward!')
+                    direction = 'Forward'
+                    pwm_r.ChangeDutyCycle(10)
+                    pwm_l.ChangeDutyCycle(0)
+
+                # elif(measured_distance < lamda1): # Backward
+                #     bcolors.print_green('Backward!')
+                #     direction = 'Backward'
+                #     pwm_r.ChangeDutyCycle(0)
+                #     pwm_l.ChangeDutyCycle(10)
+                # else:
+                #     # bcolors.print_warning('Direction Error')
+                #     direction = None
+                #     pwm_r.ChangeDutyCycle(0)
+                #     pwm_l.ChangeDutyCycle(0)
 
     except KeyboardInterrupt as e: # Terminate GPIO and Servo Pins Safety!
         pwm_r.stop()
