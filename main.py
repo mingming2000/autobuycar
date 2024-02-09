@@ -33,7 +33,7 @@ class bcolors:
         print(bcolors.WARNING + text + bcolors.ENDC)
 
 
-DC_speed = 10
+DC_speed = 12
 servoPin = 17
 
 RPWM = 26	# forward	Physical 37
@@ -151,11 +151,12 @@ if __name__ == "__main__":
                 servo.set_servo_pulsewidth(servoPin, 1600)
 
             if(mode == 'Camera'):
-                bcolors.print_warning('[Move] Backward!')
-                direction = 'Backward'
-                pwm_r.ChangeDutyCycle(0)
-                pwm_l.ChangeDutyCycle(DC_speed)
-                mode = 'Bluetooth'
+                # bcolors.print_warning('[Move] Backward!')
+                # direction = 'Backward'
+                # pwm_r.ChangeDutyCycle(0)
+                # pwm_l.ChangeDutyCycle(DC_speed)
+                # mode = 'Bluetooth'
+                pass
             elif(mode == 'Bluetooth'):
                 # Control DC Motor!
                 if(measured_distance > lambda2): # Forward
@@ -165,6 +166,8 @@ if __name__ == "__main__":
                     pwm_l.ChangeDutyCycle(0)
                 else:
                     bcolors.print_warning('[Move] Stop!')
+                    pwm_r.ChangeDutyCycle(0)
+                    pwm_l.ChangeDutyCycle(0)
 
                 # elif(measured_distance < lambda1): # Backward
                 #     bcolors.print_green('Bacward!')

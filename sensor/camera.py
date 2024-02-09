@@ -88,7 +88,7 @@ class Camera:
                         max_contour_sel = mask_contour
                         len_max_contour = area
 
-                print(f">>> Contour : {len_max_contour}")
+                # print(f">>> Contour : {len_max_contour}")
 
                 if max_contour_sel is not None:
                     x_list = [ node[0][0] for node in max_contour_sel ]
@@ -98,6 +98,6 @@ class Camera:
                         mode = 'Camera'
         degree_servo = 1300 + measured_angle * 6 
         # print(f">>> mask_area: {area}, degree: {degree_servo:.2f}, mode: {mode} ")
-        return len_max_contour
-        # return degree_servo, mode
+        # return len_max_contour
+        return degree_servo, mode
 

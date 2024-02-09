@@ -62,14 +62,14 @@ while True:
     if key == 'w':
     # if keyboard.is_pressed('w'):
         print("w pressed")
-        pwm_r.ChangeDutyCycle(30)
+        pwm_r.ChangeDutyCycle(15)
         pwm_l.ChangeDutyCycle(0)
         #dcControl(pwm_r, pwm_l, FORWARD, speed)
     elif key == 's':
     # elif keyboard.is_pressed('s'):
         print("s pressed")
         pwm_r.ChangeDutyCycle(0)
-        pwm_l.ChangeDutyCycle(30)
+        pwm_l.ChangeDutyCycle(15)
         #dcControl(pwm_r, pwm_l, BACKWARD, speed)
     else:
         pwm_r.ChangeDutyCycle(0)
@@ -82,20 +82,20 @@ while True:
         print("a pressed")
         servo.set_servo_pulsewidth(servoPin, 1300)
         if(last == 'w'):
-            pwm_r.ChangeDutyCycle(20)
+            pwm_r.ChangeDutyCycle(10)
             pwm_l.ChangeDutyCycle(0)
         elif(last == 's'):
-            pwm_l.ChangeDutyCycle(20)
+            pwm_l.ChangeDutyCycle(10)
             pwm_r.ChangeDutyCycle(0)
     elif key == 'd':
         print("d pressed")
         servo.set_servo_pulsewidth(servoPin, 1900)
         if(last == 'w'):
-            pwm_r.ChangeDutyCycle(20)
+            pwm_r.ChangeDutyCycle(10)
             pwm_l.ChangeDutyCycle(0)
         elif(last == 's'):
             pwm_r.ChangeDutyCycle(0)
-            pwm_l.ChangeDutyCycle(20)
+            pwm_l.ChangeDutyCycle(10)
     else:
         servo.set_servo_pulsewidth(servoPin, 1600)
     time.sleep(0.03)
